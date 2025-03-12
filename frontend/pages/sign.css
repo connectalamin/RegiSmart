@@ -19,13 +19,26 @@
 
 body {
     min-height: 100vh;
-    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    background: linear-gradient(135deg, rgba(8, 30, 224, 0.76), rgba(4, 63, 158, 0.486));
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    
 }
-
+body::before {
+    content: "";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 500px;
+    height: 500px;
+    background: url('Comilla-University-Logo-PNG.png') no-repeat center center;
+    background-size: contain;
+    opacity: 0.1;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+}
 /* Header Styles */
 .header {
     text-align: center;
