@@ -6,6 +6,7 @@
     <title>Sign Up - RegiSmart</title>
     <link rel="stylesheet" href="./sign.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <div class="header">
@@ -60,7 +61,7 @@
     </div>
 
     <script>
-        document.getElementById("signupForm").addEventListener("submit", function(event) {
+        document.getElementById("signupForm").addEventListener("submit", async function(event) {
             event.preventDefault();
             let name = document.getElementById("name").value;
             let email = document.getElementById("email").value;
@@ -77,10 +78,23 @@
                 return;
             }
 
-            let user = { name, email, studentId, department, session, hall, mobile, password };
-            localStorage.setItem("user", JSON.stringify(user));
-            alert("Sign-up successful! Redirecting to login page...");
-            window.location.href = "login.html";
+            try {
+                const response = await axios.post('http://localhost:5000/api/auth/register', {
+                    email,
+                    password,
+                    name,
+                    student_id: studentId,
+                    session,
+                    department,
+                    batch: null, // Not in form, can be added later
+                    hall_name: hall,
+                    mobile_number: mobile
+                });
+                alert(response.data.message || "Sign-up successful! Redirecting to login page...");
+                window.location.href = "student_login.html";
+            } catch (error) {
+                alert(error.response?.data?.error || "Sign-up failed. Please try again!");
+            }
         });
 
         document.getElementById("loginRedirect").addEventListener("click", function(event) {

@@ -28,12 +28,25 @@ const examRegistrationModel = {
     }
   },
 
-  async findPaidRegistration(user_id) {
+async findPaidRegistration(user_id) {
+  const connection = await pool.getConnection();
+  try {
+    const [rows] = await connection.execute(
+      'SELECT id, user_id, semester, payment_amount, transaction_id, courses FROM exam_registrations WHERE user_id = ? AND transaction_id IS NOT NULL ORDER BY created_at DESC LIMIT 1',
+      [user_id]
+    );
+    return rows[0];
+  } finally {
+    connection.release();
+  }
+},
+
+  async findPaidRegistrationBySemester(user_id, semester) {
     const connection = await pool.getConnection();
     try {
       const [rows] = await connection.execute(
-        'SELECT * FROM exam_registrations WHERE user_id = ? AND transaction_id IS NOT NULL ORDER BY created_at DESC LIMIT 1',
-        [user_id]
+        'SELECT * FROM exam_registrations WHERE user_id = ? AND semester = ? AND transaction_id IS NOT NULL ORDER BY created_at DESC LIMIT 1',
+        [user_id, semester]
       );
       return rows[0];
     } finally {

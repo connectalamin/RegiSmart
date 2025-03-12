@@ -9,6 +9,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
     <div class="header">
@@ -121,7 +122,7 @@
 
       document
         .getElementById('registrationForm')
-        .addEventListener('submit', function (event) {
+        .addEventListener('submit', async function (event) {
           event.preventDefault();
 
           const semester = document.getElementById('semester').value;
@@ -131,18 +132,31 @@
             return;
           }
 
-          // Store registration data in sessionStorage
-          const registrationData = {
-            semester: semester,
-            courses: courses,
-          };
-          sessionStorage.setItem(
-            'registrationData',
-            JSON.stringify(registrationData)
-          );
+          const token = localStorage.getItem('token');
+          if (!token) {
+            alert('Please login first!');
+            window.location.href = 'student_login.html';
+            return;
+          }
 
-          // Redirect to payment page instead of dashboard
-          window.location.href = 'payment.html';
+          try {
+            const response = await axios.post('http://localhost:5000/api/exam/registration', {
+              semester,
+            }, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            const { registrationId, payment_amount } = response.data;
+            const registrationData = {
+              semester,
+              courses,
+              registrationId,
+              payment_amount
+            };
+            sessionStorage.setItem('registrationData', JSON.stringify(registrationData));
+            window.location.href = 'payment.html';
+          } catch (error) {
+            alert(error.response?.data?.error || 'Registration failed. Please try again!');
+          }
         });
     </script>
   </body>

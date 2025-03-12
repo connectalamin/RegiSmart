@@ -9,6 +9,9 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
     <div class="header">
@@ -16,103 +19,293 @@
       <h1>Student Dashboard</h1>
     </div>
 
-    <div class="dashboard">
-      <div class="profile-section">
-        <label for="profilePic" class="upload-label">
-          <img
-            id="profileImage"
-            src="default-avatar.png"
-            alt="Profile Picture"
-            class="profile-pic"
+    <div class="dashboard-container">
+      <div class="dashboard">
+        <!-- Student Profile Section -->
+        <div class="profile-section">
+          <h3>Student Profile</h3>
+          <label for="profilePic" class="upload-label">
+            <img
+              id="profileImage"
+              src="newlogo.jpg"
+              alt="Profile Picture"
+              class="profile-pic"
+            />
+          </label>
+          <input
+            type="file"
+            id="profilePic"
+            accept="image/*"
+            style="display: none"
           />
-        </label>
-        <input
-          type="file"
-          id="profilePic"
-          accept="image/*"
-          style="display: none"
-        />
-      </div>
-
-      <div class="student-info">
-        <h2>Welcome, <span id="studentName"></span>!</h2>
-        <p><strong>Student ID:</strong> <span id="studentId"></span></p>
-        <p><strong>Department:</strong> <span id="department"></span></p>
-        <p><strong>Session:</strong> <span id="session"></span></p>
-        <p><strong>Hall:</strong> <span id="hall"></span></p>
-        <p><strong>Mobile:</strong> <span id="mobile"></span></p>
-      </div>
-
-      <div class="admit-card">
-        <h3>Admit Card</h3>
-        <div class="admit-card-content">
-          <div class="watermark">Comilla University</div>
-          <div class="admit-header">
-            <img src="newlogo.jpg" alt="University Logo" class="admit-logo" />
-            <h4>Comilla University</h4>
-            <p>Official Student Admit Card</p>
-            <p class="session-text">
-              Academic Session: <span id="admitCardSession"></span>
-            </p>
+          <div class="profile-info">
+            <p><strong>Name:</strong> <span id="studentName"></span></p>
+            <p><strong>ID:</strong> <span id="studentId"></span></p>
+            <p><strong>Department:</strong> <span id="department"></span></p>
+            <p><strong>Session:</strong> <span id="session"></span></p>
+            <p><strong>Hall:</strong> <span id="hall"></span></p>
+            <p><strong>Mobile:</strong> <span id="mobile"></span></p>
           </div>
-          <div class="admit-details">
-            <div class="student-photo">
-              <img
-                id="admitCardPhoto"
-                src="default-avatar.png"
-                alt="Student Photo"
-              />
-            </div>
-            <div class="admit-info">
-              <p><strong>Name:</strong> <span id="admitCardName"></span></p>
-              <p><strong>Student ID:</strong> <span id="admitCardId"></span></p>
-              <p>
-                <strong>Department:</strong> <span id="admitCardDept"></span>
-              </p>
-              <p><strong>Hall:</strong> <span id="admitCardHall"></span></p>
-              <p><strong>Issue Date:</strong> <span id="issueDate"></span></p>
-              <p><strong>Valid Until:</strong> <span id="validUntil"></span></p>
-            </div>
-          </div>
-          <div class="admit-footer">
-            <div class="signature-box">
-              <div class="signature-line">
-                <p>Student's Signature</p>
-              </div>
-            </div>
-            <div class="signature-box">
-              <div class="signature-line">
-                <p>Controller of Examinations</p>
-              </div>
+        </div>
+
+        <!-- Admit Card Section -->
+        <div class="admit-card-section">
+          <h3>Admit Cards</h3>
+          <div class="admit-card-list">
+            <div class="admit-card-item">
+              <span>Latest Admit Card</span>
+              <button class="btn secondary" onclick="downloadLatestAdmitCard()">
+                Download
+              </button>
             </div>
           </div>
         </div>
-        <button id="downloadAdmit" class="btn primary">
-          Download Admit Card
-        </button>
-      </div>
 
-      <div class="dashboard-buttons">
-        <a href="registration.html" class="btn primary"
-          >Proceed to Registration</a
-        >
-        <button id="logout" class="btn secondary">Logout</button>
+        <div class="dashboard-buttons">
+          <a href="registration.html" class="btn primary"
+            >Proceed to Registration</a
+          >
+          <button id="logout" class="btn secondary">Logout</button>
+          <button class="btn secondary" onclick="goBack()">Back</button>
+        </div>
       </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Hidden Admit Card Template for PDF Generation -->
+    <div id="admitCardTemplate" style="display: none">
+      <div class="admit-card-content-pdf">
+        <div class="admit-header">
+          <img
+            src="Comilla-University-Logo-PNG.png"
+            alt="University Logo"
+            class="admit-logo"
+          />
+          <h4>Comilla University</h4>
+          <p>Official Student Admit Card</p>
+        </div>
+        <div class="admit-details-pdf">
+          <div class="student-photo">
+            <img id="pdfAdmitCardPhoto" src="newlogo.jpg" alt="Student Photo" />
+          </div>
+          <div class="admit-info-pdf" id="pdfAdmitInfo">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+        <div class="admit-footer-pdf">
+          <div class="signature-box">
+            <div class="signature-line">
+              <p>Student's Signature</p>
+            </div>
+          </div>
+          <div class="signature-box">
+            <div class="signature-line">
+              <p>Controller of Examinations</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
-      let user = JSON.parse(localStorage.getItem('user'));
-      if (user) {
-        document.getElementById('studentName').innerText = user.name;
-        document.getElementById('studentId').innerText = user.studentId;
-        document.getElementById('department').innerText = user.department;
-        document.getElementById('session').innerText = user.session;
-        document.getElementById('hall').innerText = user.hall;
-        document.getElementById('mobile').innerText = user.mobile;
-      } else {
+      const token = localStorage.getItem('token');
+      if (!token) {
         alert('No user logged in! Redirecting to login.');
         window.location.href = 'student_login.html';
+      }
+
+      async function loadDashboard() {
+        try {
+          const response = await axios.get(
+            'http://localhost:5000/api/users/dashboard',
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          const user = response.data;
+          console.log('Dashboard response:', user);
+          document.getElementById('studentName').innerText = user.name || 'N/A';
+          document.getElementById('studentId').innerText =
+            user.student_id || 'N/A';
+          document.getElementById('department').innerText =
+            user.department || 'N/A';
+          document.getElementById('session').innerText = user.session || 'N/A';
+          document.getElementById('hall').innerText = user.hall_name || 'N/A';
+          document.getElementById('mobile').innerText =
+            user.mobile_number || 'N/A';
+        } catch (error) {
+          console.error(
+            'Dashboard error:',
+            error.response ? error.response.data : error
+          );
+          alert(error.response?.data?.error || 'Failed to load dashboard.');
+        }
+      }
+
+      async function loadAdmitCard(semester = null) {
+        try {
+          document
+            .querySelectorAll('.admit-card-item button')
+            .forEach((btn) => {
+              btn.disabled = true;
+              btn.innerText = 'Loading...';
+            });
+
+          const response = await axios.get(
+            `http://localhost:5000/api/exam/admit-card?format=json${
+              semester ? `&semester=${semester}` : ''
+            }`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          const data = response.data;
+          console.log('Admit card response:', data);
+          return data;
+        } catch (error) {
+          console.error(
+            'Admit card error:',
+            error.response ? error.response.data : error
+          );
+          alert(
+            'Failed to load admit card details: ' +
+              (error.response?.data?.error || error.message)
+          );
+          return null;
+        } finally {
+          document
+            .querySelectorAll('.admit-card-item button')
+            .forEach((btn) => {
+              btn.disabled = false;
+              btn.innerText = 'Download';
+            });
+        }
+      }
+      async function downloadAdmitCard(semester = null) {
+        const data = await loadAdmitCard(semester);
+        if (!data) return;
+
+        // Create temporary container
+        const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'fixed';
+        tempDiv.style.left = '-9999px';
+        tempDiv.innerHTML =
+          document.getElementById('admitCardTemplate').innerHTML;
+
+        // Populate content with reduced sizes
+        const admitInfo = tempDiv.querySelector('#pdfAdmitInfo');
+        admitInfo.innerHTML = `
+    <p><strong>Exam:</strong> ${
+      data.semester || 'N/A'
+    } Semester Final Examination of ${data.session || 'N/A'}</p>
+    <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+    <p><strong>ID:</strong> ${data.student_id || 'N/A'}</p>
+    <p><strong>Batch:</strong> ${data.batch || 'N/A'}</p>
+    <p><strong>Dept:</strong> ${data.department || 'N/A'}</p>
+    <p><strong>Hall:</strong> ${data.hall_name || 'N/A'}</p>
+    <p><strong>Transaction ID:</strong> ${data.transaction_id || 'N/A'}</p>
+  `;
+
+        // Handle profile image with reduced size
+        const profileImg = tempDiv.querySelector('#pdfAdmitCardPhoto');
+        if (localStorage.getItem('profileImage')) {
+          profileImg.src = localStorage.getItem('profileImage');
+        }
+        profileImg.style.width = '30mm'; // Reduced from 50mm
+        profileImg.style.height = '40mm'; // Reduced from 60mm
+
+        // Reduce logo size
+        const logoImg = tempDiv.querySelector('.admit-logo');
+        logoImg.style.width = '40mm'; // Reduced from 80mm
+
+        // Apply reduced font sizes and padding
+        tempDiv
+          .querySelectorAll('h4')
+          .forEach((el) => (el.style.fontSize = '9mm')); // Reduced from 18mm
+        tempDiv
+          .querySelectorAll('p')
+          .forEach((el) => (el.style.fontSize = '3mm')); // Reduced from 6mm/10mm
+        tempDiv.querySelector('.admit-header').style.marginBottom = '7mm'; // Reduced from 15mm
+        tempDiv.querySelector('.admit-details-pdf').style.margin = '7mm 0'; // Reduced from 15mm
+        tempDiv.querySelector('.admit-footer-pdf').style.marginTop = '7mm'; // Reduced from 15mm
+        tempDiv
+          .querySelectorAll('.signature-line')
+          .forEach((el) => (el.style.width = '25mm')); // Reduced from 50mm
+
+        // Add to DOM
+        document.body.appendChild(tempDiv);
+
+        // Wait for images to load
+        await new Promise((resolve) => {
+          if (profileImg.complete && logoImg.complete) return resolve();
+          const images = [profileImg, logoImg];
+          let loaded = 0;
+          images.forEach((img) => {
+            img.onload = () => {
+              loaded++;
+              if (loaded === images.length) resolve();
+            };
+            img.onerror = () => {
+              loaded++;
+              if (loaded === images.length) resolve();
+            };
+          });
+        });
+
+        // Generate PDF using jsPDF and html2canvas
+        try {
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+          });
+
+          // Render the tempDiv to canvas with reduced scale
+          const canvas = await html2canvas(tempDiv, {
+            scale: 1.5, // Reduced from 2 to fit content
+            logging: true,
+            useCORS: true,
+            allowTaint: true,
+          });
+
+          // Convert canvas to image
+          const imgData = canvas.toDataURL('image/png');
+          const imgWidth = 210; // A4 width in mm
+          const pageHeight = 297; // A4 height in mm
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          let heightLeft = imgHeight;
+
+          let position = 0;
+
+          // Add the image to PDF, ensuring it fits on one page
+          if (imgHeight <= pageHeight) {
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          } else {
+            console.warn('Content too large for one page, scaling down height');
+            const scaleFactor = pageHeight / imgHeight;
+            pdf.addImage(
+              imgData,
+              'PNG',
+              0,
+              position,
+              imgWidth,
+              imgHeight * scaleFactor
+            );
+          }
+
+          // Save the PDF
+          pdf.save(
+            `admit_card_${data.semester || 'latest'}_${
+              document.getElementById('studentId').innerText || 'user'
+            }.pdf`
+          );
+        } catch (error) {
+          console.error('PDF generation failed:', error);
+          alert('Failed to generate PDF');
+        } finally {
+          document.body.removeChild(tempDiv);
+        }
+      }
+      async function downloadLatestAdmitCard() {
+        await downloadAdmitCard();
       }
 
       const profilePicInput = document.getElementById('profilePic');
@@ -135,50 +328,17 @@
       }
 
       document.getElementById('logout').addEventListener('click', function () {
-        localStorage.removeItem('user');
+        localStorage.removeItem('token');
         localStorage.removeItem('profileImage');
+        alert('Logged out successfully!');
         window.location.href = 'student_login.html';
       });
 
-      function updateAdmitCard(user) {
-        document.getElementById('admitCardName').innerText = user.name;
-        document.getElementById('admitCardId').innerText = user.studentId;
-        document.getElementById('admitCardDept').innerText = user.department;
-        document.getElementById('admitCardSession').innerText = user.session;
-        document.getElementById('admitCardHall').innerText = user.hall;
-
-        if (savedProfileImage) {
-          document.getElementById('admitCardPhoto').src = savedProfileImage;
-        }
-
-        const today = new Date();
-        const validityDate = new Date();
-        validityDate.setFullYear(validityDate.getFullYear() + 1);
-
-        document.getElementById('issueDate').innerText =
-          today.toLocaleDateString();
-        document.getElementById('validUntil').innerText =
-          validityDate.toLocaleDateString();
+      function goBack() {
+        window.history.back();
       }
 
-      if (user) {
-        updateAdmitCard(user);
-      }
-
-      document
-        .getElementById('downloadAdmit')
-        .addEventListener('click', function () {
-          const element = document.querySelector('.admit-card-content');
-          const opt = {
-            margin: 1,
-            filename: `admit_card_${user.studentId}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-          };
-
-          html2pdf().set(opt).from(element).save();
-        });
+      loadDashboard();
     </script>
   </body>
 </html>

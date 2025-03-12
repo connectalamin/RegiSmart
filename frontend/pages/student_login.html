@@ -6,6 +6,7 @@
     <title>Login - RegiSmart</title>
     <link rel="stylesheet" href="./sign.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <div class="header">
@@ -30,17 +31,22 @@
     </div>
 
     <script>
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
             event.preventDefault();
             let email = document.getElementById("email").value;
             let password = document.getElementById("password").value;
-            let user = JSON.parse(localStorage.getItem("user"));
 
-            if (user && user.email === email && user.password === password) {
+            try {
+                const response = await axios.post('http://localhost:5000/api/auth/login', {
+                    email,
+                    password
+                });
+                const token = response.data.token;
+                localStorage.setItem('token', token); // Store token for future requests
                 alert("Login successful!");
                 window.location.href = "student_dashboard.html";
-            } else {
-                alert("Invalid email or password!");
+            } catch (error) {
+                alert(error.response?.data?.error || "Login failed. Please try again!");
             }
         });
     </script>

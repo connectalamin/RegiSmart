@@ -27,7 +27,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-top: 2rem;
 }
 body::before {
   content: '';
@@ -42,49 +43,73 @@ body::before {
   transform: translate(-50%, -50%);
   z-index: -1;
 }
+
 /* Header Styles */
 .header {
   text-align: center;
-  margin: 2rem 0;
+  margin: 2rem 0 3rem;
 }
 
 .header .logo {
-  width: 100px;
+  width: 120px;
   height: auto;
 }
 
 .header h1 {
   color: var(--text-light);
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: 600;
   margin-top: 1rem;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+  width: 100%;
+  max-width: 900px;
+  padding: 0 1rem;
 }
 
 /* Dashboard Styles */
 .dashboard {
   background: var(--form-bg);
   backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 2.5rem;
   width: 100%;
-  max-width: 600px;
-  text-align: center;
   color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 
 /* Profile Section */
 .profile-section {
-  margin-bottom: 2rem;
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-section h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: rgb(218, 218, 255);
 }
 
 .profile-pic {
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   object-fit: cover;
   cursor: pointer;
-  border: 2px solid var(--accent-color);
+  border: 3px solid var(--accent-color);
+  transition: transform 0.3s ease;
+}
+
+.profile-pic:hover {
+  transform: scale(1.1);
 }
 
 .upload-label {
@@ -92,41 +117,232 @@ body::before {
   cursor: pointer;
 }
 
-/* Student Info */
-.student-info {
-  margin-bottom: 2rem;
+.profile-info {
+  margin-top: 1.5rem;
+  text-align: left;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
 }
 
-.student-info h2 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.student-info p {
-  font-size: 1rem;
+.profile-info p {
+  font-size: 1.1rem;
   margin: 0.5rem 0;
 }
 
-.student-info strong {
-  color: var(--accent-color);
+.profile-info strong {
+  color: rgb(218, 218, 255);
+  min-width: 100px;
+  display: inline-block;
+}
+
+/* Admit Card Section */
+.admit-card-section {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.admit-card-section h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color:rgb(218, 218, 255);
+}
+
+.admit-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admit-card-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.admit-card-item span {
+  font-size: 1.1rem;
+  color: var(--text-light);
 }
 
 /* Dashboard Buttons */
 .dashboard-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
-/* Form Container */
+/* Button Styles */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  color: var(--text-light);
+  font-size: 1.1rem;
+}
+
+.btn.primary {
+  background-color: var(--primary-color);
+}
+
+.btn.secondary {
+  background-color: var(--secondary-color);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+/* Admit Card Template for PDF (Hidden) */
+#admitCardTemplate {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+
+.admit-card-content-pdf {
+  width: 210mm; /* A4 width */
+  height: 297mm; /* A4 height */
+  background: white;
+  padding: 20mm;
+  border: 2px solid #000;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.admit-header {
+  text-align: center;
+  margin-bottom: 15mm;
+  padding-bottom: 5mm;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.admit-logo {
+  width: 80mm;
+  height: auto;
+  margin-bottom: 5mm;
+}
+
+.admit-header h4 {
+  font-size: 18mm;
+  color: #1a237e;
+  margin-bottom: 2mm;
+  font-weight: 600;
+}
+
+.admit-header p {
+  font-size: 10mm;
+  color: #455a64;
+  text-transform: uppercase;
+  letter-spacing: 0.5mm;
+  font-weight: 500;
+}
+
+.admit-details-pdf {
+  display: flex;
+  gap: 15mm;
+  margin: 15mm 0;
+  align-items: flex-start;
+}
+
+.student-photo {
+  width: 50mm;
+  height: 60mm;
+  border: 2px solid var(--primary-color);
+  overflow: hidden;
+  box-shadow: 0 2mm 4mm rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.student-photo::after {
+  content: 'Student Photo';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(37, 99, 235, 0.9);
+  color: white;
+  text-align: center;
+  padding: 2mm;
+  font-size: 4mm;
+  font-weight: 500;
+}
+
+.student-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admit-info-pdf {
+  flex: 1;
+}
+
+.admit-info-pdf p {
+  margin: 5mm 0;
+  font-size: 6mm;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+}
+
+.admit-info-pdf strong {
+  min-width: 30mm;
+  color: #1a237e;
+  font-weight: 600;
+}
+
+.admit-footer-pdf {
+  text-align: right;
+  margin-top: 15mm;
+  padding-top: 5mm;
+  border-top: 2px solid var(--primary-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.admit-footer-pdf .signature-box {
+  text-align: center;
+}
+
+.admit-footer-pdf .signature-line {
+  border-top: 1px solid #333;
+  width: 50mm;
+  margin-top: 2mm;
+}
+
+.admit-footer-pdf p {
+  font-style: italic;
+  color: #1a237e;
+  font-weight: 500;
+  margin-top: 2mm;
+  font-size: 6mm;
+}
+
+/* Form Container for Registration Page */
 .form-container {
   background: var(--form-bg);
   backdrop-filter: blur(10px);
-  border-radius: 1rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 2.5rem;
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   text-align: center;
   color: var(--text-light);
 }
@@ -134,6 +350,7 @@ body::before {
 .form-container h2 {
   font-size: 2rem;
   margin-bottom: 1.5rem;
+  color: var(--accent-color);
 }
 
 /* Form Group */
@@ -144,7 +361,7 @@ body::before {
 
 .form-group label {
   display: block;
-  font-size: 1rem;
+  font-size: 1.1rem;
   margin-bottom: 0.5rem;
   color: var(--text-light);
 }
@@ -172,28 +389,85 @@ body::before {
   background: rgba(255, 255, 255, 0.3);
 }
 
-.form-group select[multiple] {
-  height: 150px; /* Adjust height for multiple selections */
+/* Course Input Group */
+.course-input-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
-/* Button Styles */
-.btn {
-  padding: 1rem 2rem;
-  border-radius: 0.5rem;
-  text-decoration: none;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  cursor: pointer;
+.course-input {
+  flex: 1;
+  padding: 0.75rem;
   border: none;
+  border-radius: 0.5rem;
+  background: var(--input-bg);
+  color: var(--text-light);
+  font-size: 1rem;
+  outline: none;
+  transition: background 0.3s ease;
+}
+
+.course-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.course-input:focus {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Course List */
+.course-list {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  min-height: 50px; /* Minimum height to show empty state */
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Course Item */
+.course-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: var(--text-light);
 }
 
-.btn.primary {
-  background-color: var(--primary-color);
+.course-item span {
+  color: var(--text-light);
+  font-size: 1rem;
 }
 
-.btn.secondary {
-  background-color: var(--secondary-color);
+.course-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn.edit {
+  background-color: #ffc107;
+  color: #000;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+.btn.delete {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+/* Hover Effects */
+.course-item:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .btn:hover {
@@ -204,365 +478,130 @@ body::before {
 /* Responsive Design */
 @media (max-width: 768px) {
   .header h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
-  .dashboard,
+
   .form-container {
     padding: 1.5rem;
     max-width: 90%;
   }
-  .dashboard-buttons {
+
+  .course-input-group {
     flex-direction: column;
   }
-}
 
-.hero {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-}
-
-/* Navigation Styles */
-nav {
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 4rem;
-}
-
-nav .logo {
-  width: 80px;
-  height: auto;
-}
-
-nav h1 {
-  color: var(--text-light);
-  font-size: 2.5rem;
-  font-weight: 600;
-}
-
-/* Content Section Styles */
-.content {
-  text-align: center;
-  color: var(--text-light);
-  margin-top: 2rem;
-}
-
-.content h2 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-.content p {
-  font-size: 1.2rem;
-  margin-bottom: 3rem;
-  opacity: 0.9;
-}
-
-.cta-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.btn.tertiary {
-  background-color: var(--accent-color);
-}
-
-/* Responsive adjustments for hero section */
-@media (max-width: 768px) {
-  .content h2 {
-    font-size: 2rem;
+  .course-input {
+    width: 100%;
   }
 
-  .content p {
+  .course-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .course-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dashboard {
+    padding: 1.5rem;
+  }
+
+  .profile-pic {
+    width: 120px;
+    height: 120px;
+  }
+
+  .profile-info {
+    grid-template-columns: 1fr;
+  }
+
+  .admit-card-item {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .dashboard-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header .logo {
+    width: 80px;
+  }
+
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .form-container {
+    padding: 1rem;
+  }
+
+  .form-container h2 {
+    font-size: 1.6rem;
+  }
+
+  .form-group label {
     font-size: 1rem;
   }
 
-  .cta-buttons {
-    flex-direction: column;
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
+  .course-item span {
+    font-size: 0.9rem;
+  }
+
+  .btn.edit,
+  .btn.delete {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .dashboard {
+    padding: 1rem;
+  }
+
+  .profile-section h3 {
+    font-size: 1.5rem;
+  }
+
+  .admit-card-section h3 {
+    font-size: 1.5rem;
+  }
+
+  .profile-info p {
+    font-size: 1rem;
+  }
+
+  .admit-card-item span {
+    font-size: 1rem;
   }
 }
-.course-list {
-  margin-top: 10px;
-  background-color: white;
-  padding: 10px;
-  border-radius: 4px;
-  min-height: 50px; /* Minimum height to show empty state */
+/* PDF Template Styles */
+#admitCardTemplate {
+  position: absolute !important;
+  width: 210mm !important;  /* A4 width */
+  min-height: 297mm !important; /* A4 height */
+  background: white !important;
+  color: black !important;
+  visibility: hidden;
 }
 
-.course-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  margin: 5px 0;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  color: #333; /* Dark text color for visibility */
+.admit-card-content-pdf {
+  padding: 20mm;
+  box-sizing: border-box;
 }
 
-.course-item span {
-  color: #333; /* Ensuring text is dark */
-  font-size: 14px;
+/* Add these new styles */
+#admitCardTemplate .admit-header,
+#admitCardTemplate .admit-details-pdf,
+#admitCardTemplate .admit-footer-pdf {
+  visibility: visible !important;
 }
 
-.course-input-group {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.course-input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.course-actions {
-  display: flex;
-  gap: 5px;
-}
-
-.btn.edit {
-  background-color: #ffc107;
-  color: #000; /* Black text for better contrast */
-  padding: 5px 10px;
-  font-size: 12px;
-}
-
-.btn.delete {
-  background-color: #dc3545;
-  color: white;
-  padding: 5px 10px;
-  font-size: 12px;
-}
-
-/* Add some hover effects for better interaction */
-.course-item:hover {
-  background-color: #e9ecef;
-}
-
-.btn:hover {
-  opacity: 0.9;
-}
-
-input[type='number'] {
-  width: 100%;
-  padding: 8px;
-  margin: 5px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.course-item label {
-  margin-left: 8px;
-}
-
-/* Admit Card Styles */
-.admit-card {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  color: var(--text-dark);
-  padding: 2rem;
-  margin: 2rem 0;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.admit-card h3 {
-  color: var(--primary-color);
-  font-size: 1.8rem;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-weight: 600;
-}
-
-.admit-card-content {
-  background: white;
-  padding: 3rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  position: relative;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.admit-card-content::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('newlogo.jpg') center/200px no-repeat;
-  opacity: 0.03;
-  pointer-events: none;
-}
-
-.admit-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid #007bff;
-}
-
-.admit-logo {
-  width: 100px;
+#admitCardTemplate img {
+  max-width: 100%;
   height: auto;
-  margin-bottom: 1rem;
-}
-
-.admit-header h4 {
-  font-size: 2rem;
-  color: #1a237e;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-.admit-header p {
-  font-size: 1.2rem;
-  color: #455a64;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 500;
-}
-
-.admit-details {
-  display: flex;
-  gap: 3rem;
-  margin: 2rem 0;
-  align-items: flex-start;
-}
-
-.student-photo {
-  width: 160px;
-  height: 200px;
-  border: 3px solid #007bff;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
-}
-
-.student-photo::after {
-  content: 'Student Photo';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 123, 255, 0.9);
-  color: white;
-  text-align: center;
-  padding: 4px;
-  font-size: 0.8rem;
-}
-
-.student-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.admit-info {
-  flex: 1;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-}
-
-.admit-info p {
-  margin: 1rem 0;
-  font-size: 1.1rem;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.admit-info strong {
-  min-width: 120px;
-  color: #1a237e;
-}
-
-.admit-footer {
-  text-align: right;
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 2px solid #007bff;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.admit-footer .signature-line {
-  border-top: 1px solid #333;
-  width: 200px;
-  margin-top: 0.5rem;
-  text-align: center;
-}
-
-.admit-footer p {
-  font-style: italic;
-  color: #1a237e;
-  font-weight: 500;
-}
-
-#downloadAdmit {
-  width: 100%;
-  margin-top: 1.5rem;
-  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-  color: white;
-  font-size: 1.1rem;
-  padding: 1rem;
-  border-radius: 8px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.3s ease;
-}
-
-#downloadAdmit:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Watermark style */
-.watermark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-45deg);
-  font-size: 8rem;
-  color: rgba(0, 0, 0, 0.03);
-  pointer-events: none;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .admit-details {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .student-photo {
-    margin-bottom: 1rem;
-  }
-
-  .admit-info {
-    text-align: center;
-  }
 }

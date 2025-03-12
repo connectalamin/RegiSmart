@@ -1,6 +1,8 @@
+// Import models
+import userModel from '../models/userModel.js';
 import PDFDocument from 'pdfkit';
 import examRegistrationModel from '../models/examRegistrationModel.js';
-import userModel from '../models/userModel.js';
+
 
 export const registerExam = async (req, res) => {
   const { semester } = req.body;
@@ -52,33 +54,98 @@ export const processPayment = async (req, res) => {
   }
 };
 
+
 export const getAdmitCard = async (req, res) => {
   try {
-    const registration = await examRegistrationModel.findPaidRegistration(
-      req.user.id
-    );
+    console.log('Request received for admit card:', req.query);
+    const semester = req.query.semester;
+    const userId = req.user.id;
+    console.log('User ID from middleware:', userId);
+
+    if (!userId) {
+      return res.status(401).send({ error: 'User not authenticated' });
+    }
+
+    // Fetch registration based on whether semester is provided
+    let registration;
+    if (semester) {
+      registration = await examRegistrationModel
+        .findPaidRegistrationBySemester(userId, semester)
+        .catch((err) => {
+          console.error('Error fetching registration by semester:', err);
+          throw new Error(
+            'Failed to fetch registration data for specified semester'
+          );
+        });
+    } else {
+      registration = await examRegistrationModel
+        .findPaidRegistration(userId)
+        .catch((err) => {
+          console.error('Error fetching latest registration:', err);
+          throw new Error('Failed to fetch latest registration data');
+        });
+    }
+
     if (!registration) {
       return res.status(403).send({ error: 'No paid registration found' });
     }
-    const user = await userModel.findUserById(req.user.id);
 
+    const user = await userModel.findUserById(userId).catch((err) => {
+      console.error('Error fetching user:', err);
+      throw new Error('Failed to fetch user data');
+    });
+
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+
+    const admitCardData = {
+      semester: registration.semester,
+      session: user.session || 'N/A',
+      name: user.name,
+      student_id: user.student_id || 'N/A',
+      batch: user.batch || 'N/A',
+      department: user.department || 'N/A',
+      hall_name: user.hall_name || 'N/A',
+      transaction_id: registration.transaction_id || 'N/A',
+      courses: registration.courses || [], // Include courses if available
+    };
+
+    if (req.query.format === 'json') {
+      console.log('Returning JSON:', admitCardData);
+      return res.json(admitCardData);
+    }
+
+    // Generate PDF (for non-JSON requests)
     const doc = new PDFDocument();
     res.setHeader('Content-disposition', 'attachment; filename=admit-card.pdf');
     res.setHeader('Content-type', 'application/pdf');
     doc.pipe(res);
-
     doc.fontSize(20).text('Admit Card', { align: 'center' });
     doc.moveDown();
-    doc.fontSize(14).text(`Name: ${user.name}`);
-    doc.text(`Student ID: ${user.student_id || 'N/A'}`);
-    doc.text(`Session: ${user.session || 'N/A'}`);
-    doc.text(`Department: ${user.department || 'N/A'}`);
-    doc.text(`Batch: ${user.batch || 'N/A'}`);
-    doc.text(`Semester: ${registration.semester}`);
-    doc.text(`Payment Amount: ${registration.payment_amount} TK`);
-    doc.text(`Transaction ID: ${registration.transaction_id}`);
+    doc
+      .fontSize(14)
+      .text(
+        `Exam: ${admitCardData.semester} Semester Final Examination of ${admitCardData.session}`
+      );
+    doc.text(`Name: ${admitCardData.name}`);
+    doc.text(`Student ID: ${admitCardData.student_id}`);
+    doc.text(`Batch: ${admitCardData.batch}`);
+    doc.text(`Department: ${admitCardData.department}`);
+    doc.text(`Hall: ${admitCardData.hall_name}`);
+    if (admitCardData.courses.length) {
+      doc.text(
+        `Courses: ${admitCardData.courses
+          .map((c) => `${c.code} - ${c.name}`)
+          .join(', ')}`
+      );
+    }
+    doc.text(`Transaction ID: ${admitCardData.transaction_id}`);
     doc.end();
   } catch (error) {
-    res.status(500).send({ error: 'Failed to generate admit card' });
+    console.error('Admit card generation error:', error);
+    res
+      .status(500)
+      .send({ error: 'Failed to generate admit card: ' + error.message });
   }
 };

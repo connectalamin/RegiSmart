@@ -9,6 +9,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
       body {
         background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -137,7 +138,6 @@
 
     <div class="payment-container">
       <div class="payment-icon">
-        <!-- Payment Icon SVG -->
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -164,46 +164,50 @@
     </div>
 
     <script>
-      // Load registration data from sessionStorage
       window.onload = function () {
-        const registrationData = JSON.parse(
-          sessionStorage.getItem('registrationData')
-        );
+        const registrationData = JSON.parse(sessionStorage.getItem('registrationData'));
         if (!registrationData) {
           alert('No registration data found!');
           window.location.href = 'registration.html';
           return;
         }
 
-        // Display semester info
         document.getElementById('semesterInfo').innerHTML = `
                 <p><strong>Semester:</strong> ${registrationData.semester}</p>
             `;
 
-        // Display courses
         document.getElementById('coursesList').innerHTML = `
                 <p><strong>Selected Courses:</strong></p>
                 <ul class="course-list">
                     ${registrationData.courses
-                      .map(
-                        (course) => `<li>${course.code} - ${course.name}</li>`
-                      )
+                      .map((course) => `<li>${course.code} - ${course.name}</li>`)
                       .join('')}
                 </ul>
             `;
 
-        // Calculate and display fee
-        const semester = parseInt(registrationData.semester);
-        const fee = semester % 2 === 1 ? 5000 : 600;
-        document.getElementById('feeAmount').textContent = fee.toLocaleString();
+        document.getElementById('feeAmount').textContent = registrationData.payment_amount.toLocaleString();
       };
 
-      function confirmPayment() {
+      async function confirmPayment() {
         if (confirm('Are you sure you want to proceed with the payment?')) {
-          // Clear registration data from sessionStorage
-          sessionStorage.removeItem('registrationData');
-          alert('Payment successful!');
-          window.location.href = 'student_dashboard.html';
+          const token = localStorage.getItem('token');
+          if (!token) {
+            alert('Please login first!');
+            window.location.href = 'student_login.html';
+            return;
+          }
+
+          const registrationData = JSON.parse(sessionStorage.getItem('registrationData'));
+          try {
+            const response = await axios.post('http://localhost:5000/api/exam/payment', {}, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            alert(response.data.message || 'Payment successful!');
+            sessionStorage.removeItem('registrationData');
+            window.location.href = 'student_dashboard.html';
+          } catch (error) {
+            alert(error.response?.data?.error || 'Payment failed. Please try again!');
+          }
         }
       }
     </script>
