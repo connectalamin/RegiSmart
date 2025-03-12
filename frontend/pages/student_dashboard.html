@@ -178,6 +178,7 @@
             });
         }
       }
+
       async function downloadAdmitCard(semester = null) {
         const data = await loadAdmitCard(semester);
         if (!data) return;
@@ -186,22 +187,37 @@
         const tempDiv = document.createElement('div');
         tempDiv.style.position = 'fixed';
         tempDiv.style.left = '-9999px';
-        tempDiv.innerHTML =
-          document.getElementById('admitCardTemplate').innerHTML;
+        tempDiv.innerHTML = document.getElementById('admitCardTemplate').innerHTML;
+
+        // Handle courses based on its type
+        let coursesArray = [];
+        if (typeof data.courses === 'string') {
+          try {
+            coursesArray = JSON.parse(data.courses || '[]');
+          } catch (error) {
+            console.error('Error parsing courses JSON:', error);
+            coursesArray = []; // Default to empty array if parsing fails
+          }
+        } else if (Array.isArray(data.courses)) {
+          coursesArray = data.courses; // Use the array directly if already an array
+        }
 
         // Populate content with reduced sizes
         const admitInfo = tempDiv.querySelector('#pdfAdmitInfo');
         admitInfo.innerHTML = `
-    <p><strong>Exam:</strong> ${
-      data.semester || 'N/A'
-    } Semester Final Examination of ${data.session || 'N/A'}</p>
-    <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
-    <p><strong>ID:</strong> ${data.student_id || 'N/A'}</p>
-    <p><strong>Batch:</strong> ${data.batch || 'N/A'}</p>
-    <p><strong>Dept:</strong> ${data.department || 'N/A'}</p>
-    <p><strong>Hall:</strong> ${data.hall_name || 'N/A'}</p>
-    <p><strong>Transaction ID:</strong> ${data.transaction_id || 'N/A'}</p>
-  `;
+          <p><strong>Exam:</strong> ${data.semester || 'N/A'} Semester Final Examination of ${data.session || 'N/A'}</p>
+          <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+          <p><strong>ID:</strong> ${data.student_id || 'N/A'}</p>
+          <p><strong>Batch:</strong> ${data.batch || 'N/A'}</p>
+          <p><strong>Dept:</strong> ${data.department || 'N/A'}</p>
+          <p><strong>Hall:</strong> ${data.hall_name || 'N/A'}</p>
+          <p><strong>Courses:</strong> ${
+            Array.isArray(coursesArray) && coursesArray.length
+              ? coursesArray.map(c => `${c.code || 'N/A'} - ${c.name || 'N/A'}`).join(', ')
+              : 'N/A'
+          }</p>
+          <p><strong>Transaction ID:</strong> ${data.transaction_id || 'N/A'}</p>
+        `;
 
         // Handle profile image with reduced size
         const profileImg = tempDiv.querySelector('#pdfAdmitCardPhoto');
@@ -304,6 +320,7 @@
           document.body.removeChild(tempDiv);
         }
       }
+
       async function downloadLatestAdmitCard() {
         await downloadAdmitCard();
       }

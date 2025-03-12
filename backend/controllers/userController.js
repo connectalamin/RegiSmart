@@ -1,3 +1,4 @@
+// controllers/userController.js
 import userModel from '../models/userModel.js';
 import examRegistrationModel from '../models/examRegistrationModel.js';
 
@@ -16,6 +17,7 @@ export const getProfile = async (req, res) => {
     };
     res.send(userData);
   } catch (error) {
+    console.error('Error in getProfile:', error);
     res.status(500).send({ error: 'Failed to fetch profile' });
   }
 };
@@ -24,11 +26,17 @@ export const getDashboard = async (req, res) => {
   try {
     console.log('User ID from token:', req.user.id);
     const user = await userModel.findUserById(req.user.id);
+    if (!user) {
+      console.error('User not found for ID:', req.user.id);
+      return res.status(404).send({ error: 'User not found' });
+    }
     console.log('Fetched user:', user);
+
     const registration = await examRegistrationModel.findPaidRegistration(
       req.user.id
     );
     console.log('Fetched registration:', registration);
+
     const dashboardData = {
       email: user.email,
       name: user.name,
@@ -42,7 +50,7 @@ export const getDashboard = async (req, res) => {
     };
     res.send(dashboardData);
   } catch (error) {
-    console.error('Dashboard error:', error);
+    console.error('Dashboard error:', error.message, error.stack);
     res.status(500).send({ error: 'Failed to fetch dashboard data' });
   }
 };

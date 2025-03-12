@@ -140,17 +140,22 @@
           }
 
           try {
-            const response = await axios.post('http://localhost:5000/api/exam/registration', {
-              semester,
-            }, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
+            const response = await axios.post(
+              'http://localhost:5000/api/exam/registration',
+              {
+                semester,
+                courses, // Include courses in the request body
+              },
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
             const { registrationId, payment_amount } = response.data;
             const registrationData = {
               semester,
               courses,
               registrationId,
-              payment_amount
+              payment_amount,
             };
             sessionStorage.setItem('registrationData', JSON.stringify(registrationData));
             window.location.href = 'payment.html';

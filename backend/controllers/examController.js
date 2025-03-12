@@ -1,22 +1,19 @@
-// Import models
-import userModel from '../models/userModel.js';
+// controllers/examController.js
 import PDFDocument from 'pdfkit';
 import examRegistrationModel from '../models/examRegistrationModel.js';
-
+import userModel from '../models/userModel.js';
 
 export const registerExam = async (req, res) => {
-  const { semester } = req.body;
+  const { semester, courses } = req.body;
   try {
     const user = await userModel.findUserById(req.user.id);
     if (!user) return res.status(404).send({ error: 'User not found' });
 
-    const sessionYear = parseInt(user.session.split('-')[0]); // e.g., "2020-2021" -> 2020
+    const sessionYear = parseInt(user.session.split('-')[0]);
     let payment_amount;
     if (semester % 2 !== 0) {
-      // Odd semester
       payment_amount = sessionYear <= 2020 ? 5000 : 6000;
     } else {
-      // Even semester
       payment_amount = 600;
     }
 
@@ -24,6 +21,7 @@ export const registerExam = async (req, res) => {
       user_id: req.user.id,
       semester,
       payment_amount,
+      courses,
     });
     res.send({
       message: 'Exam registration created, proceed to payment',
@@ -31,7 +29,7 @@ export const registerExam = async (req, res) => {
       payment_amount,
     });
   } catch (error) {
-    res.status(400).send({ error: 'Registration failed' });
+    res.status(400).send({ error: 'Registration failed: ' + error.message });
   }
 };
 
@@ -54,7 +52,6 @@ export const processPayment = async (req, res) => {
   }
 };
 
-
 export const getAdmitCard = async (req, res) => {
   try {
     console.log('Request received for admit card:', req.query);
@@ -66,7 +63,6 @@ export const getAdmitCard = async (req, res) => {
       return res.status(401).send({ error: 'User not authenticated' });
     }
 
-    // Fetch registration based on whether semester is provided
     let registration;
     if (semester) {
       registration = await examRegistrationModel
@@ -108,7 +104,7 @@ export const getAdmitCard = async (req, res) => {
       department: user.department || 'N/A',
       hall_name: user.hall_name || 'N/A',
       transaction_id: registration.transaction_id || 'N/A',
-      courses: registration.courses || [], // Include courses if available
+      courses: registration.courses || '[]', // Return as raw JSON string
     };
 
     if (req.query.format === 'json') {
@@ -133,12 +129,15 @@ export const getAdmitCard = async (req, res) => {
     doc.text(`Batch: ${admitCardData.batch}`);
     doc.text(`Department: ${admitCardData.department}`);
     doc.text(`Hall: ${admitCardData.hall_name}`);
-    if (admitCardData.courses.length) {
+    if (admitCardData.courses && admitCardData.courses !== '[]') {
+      const coursesArray = JSON.parse(admitCardData.courses);
       doc.text(
-        `Courses: ${admitCardData.courses
+        `Courses: ${coursesArray
           .map((c) => `${c.code} - ${c.name}`)
           .join(', ')}`
       );
+    } else {
+      doc.text('Courses: N/A');
     }
     doc.text(`Transaction ID: ${admitCardData.transaction_id}`);
     doc.end();
