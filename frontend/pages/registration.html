@@ -5,30 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration - RegiSmart</title>
     <link rel="stylesheet" href="sign.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="header">
-        <img src="newlogo.jpg" alt="RegiSmart Logo">
+        <img src="newlogo.jpg" alt="RegiSmart Logo" class="logo">
         <h1>Student Course Registration</h1>
     </div>
 
-    <form id="registrationForm">
-        <h2>Register for Courses</h2>
-        <div class="form-group">
-            <label for="courses">Select Courses:</label>
-            <select id="courses" multiple>
-                <option value="math101">Math 101</option>
-                <option value="cs102">Computer Science 102</option>
-                <option value="eng103">English 103</option>
-            </select>
-        </div>
-        <button type="submit">Submit</button>
-    </form>
+    <div class="form-container">
+        <form id="registrationForm">
+            <h2>Register for Courses</h2>
+            <div class="form-group">
+                <label for="courses">Select Courses:</label>
+                <select id="courses" multiple required>
+                    <option value="math101">Math 101</option>
+                    <option value="cs102">Computer Science 102</option>
+                    <option value="eng103">English 103</option>
+                </select>
+            </div>
+            <button type="submit" class="btn primary">Submit</button>
+        </form>
+    </div>
 
     <script>
         document.getElementById("registrationForm").addEventListener("submit", function(event) {
-            event.preventDefault(); 
+            event.preventDefault();
             alert("Registration Successful!");
             window.location.href = "student_dashboard.html";
         });

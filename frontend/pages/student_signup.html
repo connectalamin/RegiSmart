@@ -1,71 +1,67 @@
-<!-- Signup -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - RegiSmart</title>
-    <link rel="stylesheet" href="sign.css">
-
+    <link rel="stylesheet" href="./sign.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="header">
-        <img src="newlogo.jpg" alt="RegiSmart Logo">
+        <img src="newlogo.jpg" alt="RegiSmart Logo" class="logo">
         <h1>RegiSmart - Student Registration</h1>
     </div>
 
-    <form id="signupForm">
-        <h2>Sign Up</h2>
-        <div class="form-container">
+    <div class="form-container">
+        <form id="signupForm">
+            <h2>Sign Up</h2>
             <div class="form-group">
-                <label for="name">Full Name:</label>
+                <label for="name">Full Name</label>
                 <input type="text" id="name" placeholder="👤 Full Name" required>
             </div>
             <div class="form-group">
-                <label for="email">Email:</label>
+                <label for="email">Email</label>
                 <input type="email" id="email" placeholder="✉️ Email Address" required>
             </div>
             <div class="form-group">
-                <label for="studentId">Student ID:</label>
+                <label for="studentId">Student ID</label>
                 <input type="text" id="studentId" placeholder="🎓 Student ID" required>
             </div>
             <div class="form-group">
-                <label for="department">Department:</label>
+                <label for="department">Department</label>
                 <input type="text" id="department" placeholder="🏢 Department" required>
             </div>
             <div class="form-group double-field">
                 <div class="half-width">
-                    <label for="session">Session:</label>
+                    <label for="session">Session</label>
                     <input type="text" id="session" placeholder="📆 Session (e.g., 2022-23)" required>
                 </div>
                 <div class="half-width">
-                    <label for="hall">Hall Name:</label>
+                    <label for="hall">Hall Name</label>
                     <input type="text" id="hall" placeholder="🏠 Hall Name" required>
                 </div>
             </div>
             <div class="form-group">
-                <label for="mobile">Mobile Number:</label>
+                <label for="mobile">Mobile Number</label>
                 <input type="tel" id="mobile" placeholder="📞 Mobile Number" required>
             </div>
             <div class="form-group">
-                <label for="password">Password:</label>
+                <label for="password">Password</label>
                 <input type="password" id="password" placeholder="🔑 Password" required>
             </div>
             <div class="form-group">
-                <label for="confirmPassword">Confirm Password:</label>
+                <label for="confirmPassword">Confirm Password</label>
                 <input type="password" id="confirmPassword" placeholder="🔑 Confirm Password" required>
             </div>
-        </div>
-        <button type="submit">Sign Up</button>
-    </form>
-
-    <p>Already have an account? <a href="#" id="loginRedirect">Login here</a></p>
+            <button type="submit" class="btn primary">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="#" id="loginRedirect">Login here</a></p>
+    </div>
 
     <script>
         document.getElementById("signupForm").addEventListener("submit", function(event) {
-            event.preventDefault(); // Prevent default form submission
-            
-            // Get input values
+            event.preventDefault();
             let name = document.getElementById("name").value;
             let email = document.getElementById("email").value;
             let studentId = document.getElementById("studentId").value;
@@ -76,27 +72,22 @@
             let password = document.getElementById("password").value;
             let confirmPassword = document.getElementById("confirmPassword").value;
 
-            // Check if passwords match
             if (password !== confirmPassword) {
                 alert("Passwords do not match. Please try again!");
                 return;
             }
 
-            // Create user object
             let user = { name, email, studentId, department, session, hall, mobile, password };
-
-            // Store in localStorage
             localStorage.setItem("user", JSON.stringify(user));
-
             alert("Sign-up successful! Redirecting to login page...");
-            window.location.href = "login.html"; // Redirect to login
+            window.location.href = "login.html";
         });
 
         document.getElementById("loginRedirect").addEventListener("click", function(event) {
-            event.preventDefault(); // Prevent the default link action
+            event.preventDefault();
             let confirmRedirect = confirm("You already have an account. Do you want to go to the login page?");
             if (confirmRedirect) {
-                window.location.href = "login.html"; // Redirect to login page if confirmed
+                window.location.href = "student_login.html";
             }
         });
     </script>

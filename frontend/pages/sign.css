@@ -1,117 +1,200 @@
-/* Common Styles for All Pages */
-body {
-    font-family: Arial, sans-serif;
+/* Root Variables */
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #1e40af;
+    --accent-color: #60a5fa;
+    --text-light: #ffffff;
+    --text-dark: #1f2937;
+    --form-bg: rgba(255, 255, 255, 0.1);
+    --input-bg: rgba(255, 255, 255, 0.2);
+}
+
+/* General Styles */
+* {
     margin: 0;
     padding: 0;
-    background: linear-gradient(to right, #003973, #E5E5BE);
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
-body::before {
-    content: "";
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 300px;
-    height: 300px;
-    background: url('Comilla-University-Logo-PNG.png') no-repeat center center;
-    background-size: contain;
-    opacity: 0.2;
-    transform: translate(-50%, -50%);
-    z-index: -1;
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
+/* Header Styles */
 .header {
     text-align: center;
-    margin: 20px 0;
+    margin: 2rem 0;
 }
 
-.header img {
-    width: 50px;
+.header .logo {
+    width: 100px;
     height: auto;
 }
 
 .header h1 {
-    font-size: 2em;
-    margin-top: 10px;
-    color: white;
+    color: var(--text-light);
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-top: 1rem;
 }
 
-/* Form Styling */
-form {
+/* Dashboard Styles */
+.dashboard {
+    background: var(--form-bg);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 100%;
     max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: rgba(65, 42, 196, 0.7);
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    color: white;
-}
-
-h2 {
     text-align: center;
-    margin-bottom: 20px;
-    color: white;
+    color: var(--text-light);
 }
 
-.form-container {
+/* Profile Section */
+.profile-section {
+    margin-bottom: 2rem;
+}
+
+.profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid var(--accent-color);
+}
+
+.upload-label {
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* Student Info */
+.student-info {
+    margin-bottom: 2rem;
+}
+
+.student-info h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.student-info p {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+}
+
+.student-info strong {
+    color: var(--accent-color);
+}
+
+/* Dashboard Buttons */
+.dashboard-buttons {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    gap: 1rem;
+    justify-content: center;
 }
 
+/* Form Container */
+.form-container {
+    background: var(--form-bg);
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    color: var(--text-light);
+}
+
+.form-container h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Form Group */
 .form-group {
-    flex: 1 1 calc(50% - 20px);
-    margin-bottom: 15px;
+    margin-bottom: 1.5rem;
+    text-align: left;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-light);
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-button {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    background-color: #4CAF50;
-    color: white;
+    padding: 0.75rem;
     border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 20px;
+    border-radius: 0.5rem;
+    background: var(--input-bg);
+    color: var(--text-light);
+    font-size: 1rem;
+    outline: none;
+    transition: background 0.3s ease;
 }
 
-button:hover {
-    background-color: #45a049;
+.form-group input::placeholder,
+.form-group select::placeholder {
+    color: rgba(255, 255, 255, 0.7);
 }
 
-p {
-    text-align: center;
-    margin-top: 20px;
+.form-group input:focus,
+.form-group select:focus {
+    background: rgba(255, 255, 255, 0.3);
 }
 
-p a {
+.form-group select[multiple] {
+    height: 150px; /* Adjust height for multiple selections */
+}
+
+/* Button Styles */
+.btn {
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
     text-decoration: none;
-    color: #382ddb;
-    font-weight: 600;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    color: var(--text-light);
 }
 
-p a:hover {
-    text-decoration: underline;
+.btn.primary {
+    background-color: var(--primary-color);
 }
 
+.btn.secondary {
+    background-color: var(--secondary-color);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .form-group {
-        flex: 1 1 100%;
+    .header h1 {
+        font-size: 2rem;
+    }
+    .dashboard, .form-container {
+        padding: 1.5rem;
+        max-width: 90%;
+    }
+    .dashboard-buttons {
+        flex-direction: column;
     }
 }

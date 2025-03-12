@@ -4,25 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard - RegiSmart</title>
-    <link rel="stylesheet" href="sign.css">
+    <link rel="stylesheet" href="./sign.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <div class="header">
-        <img src="newlogo.jpg" alt="RegiSmart Logo">
+        <img src="newlogo.jpg" alt="RegiSmart Logo" class="logo">
         <h1>Student Dashboard</h1>
     </div>
 
     <div class="dashboard">
-        <!-- Profile Picture (Top Right Corner) -->
         <div class="profile-section">
             <label for="profilePic" class="upload-label">
-                <img id="profileImage" src="default-avatar.png" alt="Profile Picture">
+                <img id="profileImage" src="default-avatar.png" alt="Profile Picture" class="profile-pic">
             </label>
             <input type="file" id="profilePic" accept="image/*" style="display: none;">
         </div>
 
-        <!-- Student Info -->
         <div class="student-info">
             <h2>Welcome, <span id="studentName"></span>!</h2>
             <p><strong>Student ID:</strong> <span id="studentId"></span></p>
@@ -32,14 +30,14 @@
             <p><strong>Mobile:</strong> <span id="mobile"></span></p>
         </div>
 
-        <a href="registration.html" class="btn">Proceed to Registration</a>
-        <button id="logout">Logout</button>
+        <div class="dashboard-buttons">
+            <a href="registration.html" class="btn primary">Proceed to Registration</a>
+            <button id="logout" class="btn secondary">Logout</button>
+        </div>
     </div>
 
     <script>
-        // Load Student Info from Local Storage
         let user = JSON.parse(localStorage.getItem("user"));
-
         if (user) {
             document.getElementById("studentName").innerText = user.name;
             document.getElementById("studentId").innerText = user.studentId;
@@ -52,35 +50,30 @@
             window.location.href = "student_login.html";
         }
 
-        // Profile Picture Upload
         const profilePicInput = document.getElementById("profilePic");
         const profileImage = document.getElementById("profileImage");
-
         profilePicInput.addEventListener("change", function(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     profileImage.src = e.target.result;
-                    localStorage.setItem("profileImage", e.target.result); // Save Image in Local Storage
+                    localStorage.setItem("profileImage", e.target.result);
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // Load Profile Picture if Already Set
         const savedProfileImage = localStorage.getItem("profileImage");
         if (savedProfileImage) {
             profileImage.src = savedProfileImage;
         }
 
-        // Logout Function
         document.getElementById("logout").addEventListener("click", function() {
             localStorage.removeItem("user");
             localStorage.removeItem("profileImage");
             window.location.href = "student_login.html";
         });
     </script>
-
 </body>
 </html>

@@ -3,30 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - RegiSmart</title>
+    <title>RegiSmart - Student Registration System</title>
     <link rel="stylesheet" href="sign.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="header">
-        <img src="newlogo.jpg" alt="RegiSmart Logo" class="logo">
-        <h1>Welcome to <span class="highlight">RegiSmart</span></h1>
-    </div>
-
-    <div class="container">
-        <h2>Online Student Registration System</h2>
-        <div class="buttons">
-            <a href="student_login.html" class="btn student-btn">Student Login</a>
-            <a href="student_signup.html" class="btn signup-btn">Student Sign Up</a>
-            <a href="admin_login.html" class="btn admin-btn">Admin Login</a>
+    <div class="hero">
+        <nav>
+            <img src="newlogo.jpg" alt="RegiSmart Logo" class="logo">
+            <h1>RegiSmart</h1>
+        </nav>
+        
+        <div class="content">
+            <h2>Online Student Registration System</h2>
+            <p>Streamline your academic journey with our efficient registration platform</p>
+            
+            <div class="cta-buttons">
+                <a href="student_login.html" class="btn primary">Student Login</a>
+                <a href="student_signup.html" class="btn secondary">New Student Registration</a>
+                <a href="admin_login.html" class="btn tertiary">Admin Portal</a>
+            </div>
         </div>
     </div>
-
-    <script>
-        // Adding small fade-in effect
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelector('.container').classList.add('show');
-        });
-    </script>
 </body>
 </html>
