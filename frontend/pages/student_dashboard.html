@@ -1,79 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Dashboard - RegiSmart</title>
-    <link rel="stylesheet" href="./sign.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-</head>
-<body>
+    <link rel="stylesheet" href="./sign.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div class="header">
-        <img src="newlogo.jpg" alt="RegiSmart Logo" class="logo">
-        <h1>Student Dashboard</h1>
+      <img src="newlogo.jpg" alt="RegiSmart Logo" class="logo" />
+      <h1>Student Dashboard</h1>
     </div>
 
     <div class="dashboard">
-        <div class="profile-section">
-            <label for="profilePic" class="upload-label">
-                <img id="profileImage" src="default-avatar.png" alt="Profile Picture" class="profile-pic">
-            </label>
-            <input type="file" id="profilePic" accept="image/*" style="display: none;">
-        </div>
+      <div class="profile-section">
+        <label for="profilePic" class="upload-label">
+          <img
+            id="profileImage"
+            src="default-avatar.png"
+            alt="Profile Picture"
+            class="profile-pic"
+          />
+        </label>
+        <input
+          type="file"
+          id="profilePic"
+          accept="image/*"
+          style="display: none"
+        />
+      </div>
 
-        <div class="student-info">
-            <h2>Welcome, <span id="studentName"></span>!</h2>
-            <p><strong>Student ID:</strong> <span id="studentId"></span></p>
-            <p><strong>Department:</strong> <span id="department"></span></p>
-            <p><strong>Session:</strong> <span id="session"></span></p>
-            <p><strong>Hall:</strong> <span id="hall"></span></p>
-            <p><strong>Mobile:</strong> <span id="mobile"></span></p>
-        </div>
+      <div class="student-info">
+        <h2>Welcome, <span id="studentName"></span>!</h2>
+        <p><strong>Student ID:</strong> <span id="studentId"></span></p>
+        <p><strong>Department:</strong> <span id="department"></span></p>
+        <p><strong>Session:</strong> <span id="session"></span></p>
+        <p><strong>Hall:</strong> <span id="hall"></span></p>
+        <p><strong>Mobile:</strong> <span id="mobile"></span></p>
+      </div>
 
-        <div class="dashboard-buttons">
-            <a href="registration.html" class="btn primary">Proceed to Registration</a>
-            <button id="logout" class="btn secondary">Logout</button>
+      <div class="admit-card">
+        <h3>Admit Card</h3>
+        <div class="admit-card-content">
+          <div class="watermark">Comilla University</div>
+          <div class="admit-header">
+            <img src="newlogo.jpg" alt="University Logo" class="admit-logo" />
+            <h4>Comilla University</h4>
+            <p>Official Student Admit Card</p>
+            <p class="session-text">
+              Academic Session: <span id="admitCardSession"></span>
+            </p>
+          </div>
+          <div class="admit-details">
+            <div class="student-photo">
+              <img
+                id="admitCardPhoto"
+                src="default-avatar.png"
+                alt="Student Photo"
+              />
+            </div>
+            <div class="admit-info">
+              <p><strong>Name:</strong> <span id="admitCardName"></span></p>
+              <p><strong>Student ID:</strong> <span id="admitCardId"></span></p>
+              <p>
+                <strong>Department:</strong> <span id="admitCardDept"></span>
+              </p>
+              <p><strong>Hall:</strong> <span id="admitCardHall"></span></p>
+              <p><strong>Issue Date:</strong> <span id="issueDate"></span></p>
+              <p><strong>Valid Until:</strong> <span id="validUntil"></span></p>
+            </div>
+          </div>
+          <div class="admit-footer">
+            <div class="signature-box">
+              <div class="signature-line">
+                <p>Student's Signature</p>
+              </div>
+            </div>
+            <div class="signature-box">
+              <div class="signature-line">
+                <p>Controller of Examinations</p>
+              </div>
+            </div>
+          </div>
         </div>
+        <button id="downloadAdmit" class="btn primary">
+          Download Admit Card
+        </button>
+      </div>
+
+      <div class="dashboard-buttons">
+        <a href="registration.html" class="btn primary"
+          >Proceed to Registration</a
+        >
+        <button id="logout" class="btn secondary">Logout</button>
+      </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
-        let user = JSON.parse(localStorage.getItem("user"));
-        if (user) {
-            document.getElementById("studentName").innerText = user.name;
-            document.getElementById("studentId").innerText = user.studentId;
-            document.getElementById("department").innerText = user.department;
-            document.getElementById("session").innerText = user.session;
-            document.getElementById("hall").innerText = user.hall;
-            document.getElementById("mobile").innerText = user.mobile;
-        } else {
-            alert("No user logged in! Redirecting to login.");
-            window.location.href = "student_login.html";
+      let user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        document.getElementById('studentName').innerText = user.name;
+        document.getElementById('studentId').innerText = user.studentId;
+        document.getElementById('department').innerText = user.department;
+        document.getElementById('session').innerText = user.session;
+        document.getElementById('hall').innerText = user.hall;
+        document.getElementById('mobile').innerText = user.mobile;
+      } else {
+        alert('No user logged in! Redirecting to login.');
+        window.location.href = 'student_login.html';
+      }
+
+      const profilePicInput = document.getElementById('profilePic');
+      const profileImage = document.getElementById('profileImage');
+      profilePicInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            profileImage.src = e.target.result;
+            localStorage.setItem('profileImage', e.target.result);
+          };
+          reader.readAsDataURL(file);
         }
+      });
 
-        const profilePicInput = document.getElementById("profilePic");
-        const profileImage = document.getElementById("profileImage");
-        profilePicInput.addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    profileImage.src = e.target.result;
-                    localStorage.setItem("profileImage", e.target.result);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+      const savedProfileImage = localStorage.getItem('profileImage');
+      if (savedProfileImage) {
+        profileImage.src = savedProfileImage;
+      }
 
-        const savedProfileImage = localStorage.getItem("profileImage");
+      document.getElementById('logout').addEventListener('click', function () {
+        localStorage.removeItem('user');
+        localStorage.removeItem('profileImage');
+        window.location.href = 'student_login.html';
+      });
+
+      function updateAdmitCard(user) {
+        document.getElementById('admitCardName').innerText = user.name;
+        document.getElementById('admitCardId').innerText = user.studentId;
+        document.getElementById('admitCardDept').innerText = user.department;
+        document.getElementById('admitCardSession').innerText = user.session;
+        document.getElementById('admitCardHall').innerText = user.hall;
+
         if (savedProfileImage) {
-            profileImage.src = savedProfileImage;
+          document.getElementById('admitCardPhoto').src = savedProfileImage;
         }
 
-        document.getElementById("logout").addEventListener("click", function() {
-            localStorage.removeItem("user");
-            localStorage.removeItem("profileImage");
-            window.location.href = "student_login.html";
+        const today = new Date();
+        const validityDate = new Date();
+        validityDate.setFullYear(validityDate.getFullYear() + 1);
+
+        document.getElementById('issueDate').innerText =
+          today.toLocaleDateString();
+        document.getElementById('validUntil').innerText =
+          validityDate.toLocaleDateString();
+      }
+
+      if (user) {
+        updateAdmitCard(user);
+      }
+
+      document
+        .getElementById('downloadAdmit')
+        .addEventListener('click', function () {
+          const element = document.querySelector('.admit-card-content');
+          const opt = {
+            margin: 1,
+            filename: `admit_card_${user.studentId}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          };
+
+          html2pdf().set(opt).from(element).save();
         });
     </script>
-</body>
+  </body>
 </html>

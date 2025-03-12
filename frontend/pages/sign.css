@@ -369,3 +369,200 @@ input[type='number'] {
 .course-item label {
   margin-left: 8px;
 }
+
+/* Admit Card Styles */
+.admit-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: var(--text-dark);
+  padding: 2rem;
+  margin: 2rem 0;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.admit-card h3 {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.admit-card-content {
+  background: white;
+  padding: 3rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  position: relative;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.admit-card-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('newlogo.jpg') center/200px no-repeat;
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.admit-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #007bff;
+}
+
+.admit-logo {
+  width: 100px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
+.admit-header h4 {
+  font-size: 2rem;
+  color: #1a237e;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.admit-header p {
+  font-size: 1.2rem;
+  color: #455a64;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.admit-details {
+  display: flex;
+  gap: 3rem;
+  margin: 2rem 0;
+  align-items: flex-start;
+}
+
+.student-photo {
+  width: 160px;
+  height: 200px;
+  border: 3px solid #007bff;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.student-photo::after {
+  content: 'Student Photo';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 123, 255, 0.9);
+  color: white;
+  text-align: center;
+  padding: 4px;
+  font-size: 0.8rem;
+}
+
+.student-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admit-info {
+  flex: 1;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.admit-info p {
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admit-info strong {
+  min-width: 120px;
+  color: #1a237e;
+}
+
+.admit-footer {
+  text-align: right;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid #007bff;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.admit-footer .signature-line {
+  border-top: 1px solid #333;
+  width: 200px;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.admit-footer p {
+  font-style: italic;
+  color: #1a237e;
+  font-weight: 500;
+}
+
+#downloadAdmit {
+  width: 100%;
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: white;
+  font-size: 1.1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+#downloadAdmit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Watermark style */
+.watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  font-size: 8rem;
+  color: rgba(0, 0, 0, 0.03);
+  pointer-events: none;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .admit-details {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .student-photo {
+    margin-bottom: 1rem;
+  }
+
+  .admit-info {
+    text-align: center;
+  }
+}

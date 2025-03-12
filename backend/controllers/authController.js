@@ -1,4 +1,3 @@
-// controllers/authController.js
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js';
@@ -6,7 +5,17 @@ import userModel from '../models/userModel.js';
 const JWT_SECRET = 'your-secret-key';
 
 export const register = async (req, res) => {
-  const { email, password, name, student_id, session, department, batch, hall_name, mobile_number } = req.body;
+  const {
+    email,
+    password,
+    name,
+    student_id,
+    session,
+    department,
+    batch,
+    hall_name,
+    mobile_number,
+  } = req.body;
   try {
     const existingUser = await userModel.findUserByEmail(email);
     if (existingUser) {
@@ -23,9 +32,8 @@ export const register = async (req, res) => {
       batch,
       hall_name,
       mobile_number,
-      role: 'user'
     });
-    res.status(201).send({ message: 'User registered, awaiting admin verification' });
+    res.status(201).send({ message: 'User registered successfully' });
   } catch (error) {
     res.status(400).send({ error: 'Registration failed, check input data' });
   }
@@ -38,10 +46,7 @@ export const login = async (req, res) => {
     if (!user) return res.status(400).send({ error: 'Invalid credentials' });
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).send({ error: 'Invalid credentials' });
-    if (user.role === 'user' && !user.verified) {
-      return res.status(403).send({ error: 'Account not verified yet' });
-    }
-    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
     res.send({ token });
   } catch (error) {
     res.status(500).send({ error: 'Login failed' });
