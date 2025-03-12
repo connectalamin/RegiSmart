@@ -1,40 +1,49 @@
-// backend/controllers/authController.js
-const Student = require('../models/Student');
-const bcrypt = require('bcryptjs'); // For hashing passwords
-const jwt = require('jsonwebtoken'); // For generating tokens
+// controllers/authController.js
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import userModel from '../models/userModel.js';
 
-// Signup
-exports.signup = async (req, res) => {
-  const { name, email, password, course } = req.body;
-  
+const JWT_SECRET = 'your-secret-key';
+
+export const register = async (req, res) => {
+  const { email, password, name, student_id, session, department, batch, hall_name, mobile_number } = req.body;
   try {
+    const existingUser = await userModel.findUserByEmail(email);
+    if (existingUser) {
+      return res.status(400).send({ error: 'Email already registered' });
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
-    await Student.create({ name, email, password: hashedPassword, course });
-    res.status(201).send('Student registered successfully');
-  } catch (err) {
-    res.status(500).send('Error in registration');
+    await userModel.createUser({
+      email,
+      password: hashedPassword,
+      name,
+      student_id,
+      session,
+      department,
+      batch,
+      hall_name,
+      mobile_number,
+      role: 'user'
+    });
+    res.status(201).send({ message: 'User registered, awaiting admin verification' });
+  } catch (error) {
+    res.status(400).send({ error: 'Registration failed, check input data' });
   }
 };
 
-// Login
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   const { email, password } = req.body;
-
   try {
-    const [rows] = await Student.findByEmail(email);
-    
-    if (rows.length === 0) {
-      return res.status(400).send('Invalid credentials');
+    const user = await userModel.findUserByEmail(email);
+    if (!user) return res.status(400).send({ error: 'Invalid credentials' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).send({ error: 'Invalid credentials' });
+    if (user.role === 'user' && !user.verified) {
+      return res.status(403).send({ error: 'Account not verified yet' });
     }
-
-    const validPassword = await bcrypt.compare(password, rows[0].password);
-    if (!validPassword) {
-      return res.status(400).send('Invalid credentials');
-    }
-
-    const token = jwt.sign({ id: rows[0].id, email: rows[0].email }, 'secret_key'); // Use a proper secret
-    res.json({ token });
-  } catch (err) {
-    res.status(500).send('Error in login');
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+    res.send({ token });
+  } catch (error) {
+    res.status(500).send({ error: 'Login failed' });
   }
 };
