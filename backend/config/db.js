@@ -5,7 +5,7 @@ import mysql from 'mysql2';
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root', // Your DB username
-  password: '', // Your DB password
+  password: '1234', // Your DB password
   database: 'regismart_db', // Name of your DB
 });
 

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment - RegiSmart</title>
+    <link rel="stylesheet" href="sign.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 20px;
+      }
+
+      .header h1 {
+        color: white;
+      }
+
+      .payment-container {
+        max-width: 500px;
+        margin: 20px auto;
+        padding: 30px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .payment-details {
+        margin: 20px 0;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .payment-details h2 {
+        color: #1e3c72;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        border-bottom: 2px solid #1e3c72;
+        padding-bottom: 10px;
+      }
+
+      .fee-amount {
+        font-size: 32px;
+        font-weight: bold;
+        color: #1e3c72;
+        text-align: center;
+        margin: 30px 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #f6f9ff 0%, #f1f4ff 100%);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .fee-amount span {
+        color: #2ecc71;
+      }
+
+      .payment-button {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .payment-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+      }
+
+      .payment-button:active {
+        transform: translateY(0);
+      }
+
+      .course-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .course-list li {
+        padding: 12px 15px;
+        margin: 8px 0;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #1e3c72;
+        font-size: 14px;
+      }
+
+      .semester-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border-left: 4px solid #2ecc71;
+      }
+
+      .payment-icon {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .payment-icon svg {
+        width: 60px;
+        height: 60px;
+        color: #1e3c72;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <img src="newlogo.jpg" alt="RegiSmart Logo" class="logo" />
+      <h1>Payment Details</h1>
+    </div>
+
+    <div class="payment-container">
+      <div class="payment-icon">
+        <!-- Payment Icon SVG -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+          />
+        </svg>
+      </div>
+      <div class="payment-details">
+        <h2>Registration Summary</h2>
+        <div id="semesterInfo" class="semester-info"></div>
+        <div id="coursesList"></div>
+      </div>
+      <div class="fee-amount">Total Fee: <span id="feeAmount">0</span> Tk</div>
+      <button class="payment-button" onclick="confirmPayment()">
+        Confirm Payment
+      </button>
+    </div>
+
+    <script>
+      // Load registration data from sessionStorage
+      window.onload = function () {
+        const registrationData = JSON.parse(
+          sessionStorage.getItem('registrationData')
+        );
+        if (!registrationData) {
+          alert('No registration data found!');
+          window.location.href = 'registration.html';
+          return;
+        }
+
+        // Display semester info
+        document.getElementById('semesterInfo').innerHTML = `
+                <p><strong>Semester:</strong> ${registrationData.semester}</p>
+            `;
+
+        // Display courses
+        document.getElementById('coursesList').innerHTML = `
+                <p><strong>Selected Courses:</strong></p>
+                <ul class="course-list">
+                    ${registrationData.courses
+                      .map(
+                        (course) => `<li>${course.code} - ${course.name}</li>`
+                      )
+                      .join('')}
+                </ul>
+            `;
+
+        // Calculate and display fee
+        const semester = parseInt(registrationData.semester);
+        const fee = semester % 2 === 1 ? 5000 : 600;
+        document.getElementById('feeAmount').textContent = fee.toLocaleString();
+      };
+
+      function confirmPayment() {
+        if (confirm('Are you sure you want to proceed with the payment?')) {
+          // Clear registration data from sessionStorage
+          sessionStorage.removeItem('registrationData');
+          alert('Payment successful!');
+          window.location.href = 'student_dashboard.html';
+        }
+      }
+    </script>
+  </body>
+</html>
