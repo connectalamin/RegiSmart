@@ -46,19 +46,56 @@
             <p><strong>Hall:</strong> <span id="hall"></span></p>
             <p><strong>Mobile:</strong> <span id="mobile"></span></p>
           </div>
+          <!-- Update Profile Form -->
+          <button class="btn secondary" onclick="toggleUpdateForm()" style="margin-top: 1rem;">
+            Edit Profile
+          </button>
+          <div class="profile-update-section" id="updateProfileSection" style="display: none;">
+            <h4>Update Profile</h4>
+            <form id="updateProfileForm">
+              <div class="form-group">
+                <label for="updateName">Name:</label>
+                <input type="text" id="updateName" name="name" placeholder="Enter name" />
+              </div>
+              <div class="form-group">
+                <label for="updateStudentId">Student ID:</label>
+                <input type="text" id="updateStudentId" name="student_id" placeholder="Enter student ID" />
+              </div>
+              <div class="form-group">
+                <label for="updateSession">Session:</label>
+                <input type="text" id="updateSession" name="session" placeholder="Enter session" />
+              </div>
+              <div class="form-group">
+                <label for="updateDepartment">Department:</label>
+                <input type="text" id="updateDepartment" name="department" placeholder="Enter department" />
+              </div>
+              <div class="form-group">
+                <label for="updateBatch">Batch:</label>
+                <input type="text" id="updateBatch" name="batch" placeholder="Enter batch" />
+              </div>
+              <div class="form-group">
+                <label for="updateHall">Hall:</label>
+                <input type="text" id="updateHall" name="hall_name" placeholder="Enter hall" />
+              </div>
+              <div class="form-group">
+                <label for="updateMobile">Mobile:</label>
+                <input type="text" id="updateMobile" name="mobile_number" placeholder="Enter mobile number" />
+              </div>
+              <div class="dashboard-buttons">
+                <button type="submit" class="btn primary">Save Changes</button>
+                <button type="button" class="btn secondary" onclick="toggleUpdateForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
         </div>
 
         <!-- Admit Card Section -->
         <div class="admit-card-section">
           <h3>Admit Cards</h3>
-          <div class="admit-card-list">
-            <div class="admit-card-item">
-              <span>Latest Admit Card</span>
-              <button class="btn secondary" onclick="downloadLatestAdmitCard()">
-                Download
-              </button>
-            </div>
+          <div class="admit-card-list" id="admitCardList">
+            <!-- Populated dynamically -->
           </div>
+          <button class="btn secondary" onclick="fetchAdmitCards()">Refresh Admit Cards</button>
         </div>
 
         <div class="dashboard-buttons">
@@ -123,15 +160,21 @@
           );
           const user = response.data;
           console.log('Dashboard response:', user);
+
           document.getElementById('studentName').innerText = user.name || 'N/A';
-          document.getElementById('studentId').innerText =
-            user.student_id || 'N/A';
-          document.getElementById('department').innerText =
-            user.department || 'N/A';
+          document.getElementById('studentId').innerText = user.student_id || 'N/A';
+          document.getElementById('department').innerText = user.department || 'N/A';
           document.getElementById('session').innerText = user.session || 'N/A';
           document.getElementById('hall').innerText = user.hall_name || 'N/A';
-          document.getElementById('mobile').innerText =
-            user.mobile_number || 'N/A';
+          document.getElementById('mobile').innerText = user.mobile_number || 'N/A';
+
+          document.getElementById('updateName').value = user.name || '';
+          document.getElementById('updateStudentId').value = user.student_id || '';
+          document.getElementById('updateSession').value = user.session || '';
+          document.getElementById('updateDepartment').value = user.department || '';
+          document.getElementById('updateBatch').value = user.batch || '';
+          document.getElementById('updateHall').value = user.hall_name || '';
+          document.getElementById('updateMobile').value = user.mobile_number || '';
         } catch (error) {
           console.error(
             'Dashboard error:',
@@ -141,13 +184,44 @@
         }
       }
 
+      async function fetchAdmitCards() {
+        try {
+          const response = await axios.get(
+            'http://localhost:5000/api/exam/admit-card?format=json',
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          const admitCards = response.data;
+          console.log('Admit cards response:', admitCards);
+          const admitCardList = document.getElementById('admitCardList');
+          admitCardList.innerHTML = '';
+
+          if (Array.isArray(admitCards) && admitCards.length > 0) {
+            admitCards.forEach((data) => {
+              const hasCourses = Array.isArray(data.courses) && data.courses.length > 0;
+              admitCardList.innerHTML += `
+                <div class="admit-card-item">
+                  <span>Admit Card (Semester: ${data.semester})</span>
+                  <button class="btn secondary" onclick="downloadAdmitCard('${data.semester}')">Download</button>
+                  <button class="btn delete" onclick="deleteAdmitCard(${data.id})">Delete</button>
+                </div>
+              `;
+            });
+          } else {
+            admitCardList.innerHTML = '<p>No admit cards available.</p>';
+          }
+        } catch (error) {
+          console.error('Error fetching admit cards:', error);
+          document.getElementById('admitCardList').innerHTML = '<p>Failed to load admit cards.</p>';
+        }
+      }
+
       async function loadAdmitCard(semester = null) {
         try {
           document
             .querySelectorAll('.admit-card-item button')
             .forEach((btn) => {
               btn.disabled = true;
-              btn.innerText = 'Loading...';
+              btn.innerText = btn.classList.contains('delete') ? 'Delete' : 'Loading...';
             });
 
           const response = await axios.get(
@@ -156,7 +230,7 @@
             }`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
-          const data = response.data;
+          const data = Array.isArray(response.data) ? response.data[0] : response.data;
           console.log('Admit card response:', data);
           return data;
         } catch (error) {
@@ -174,7 +248,7 @@
             .querySelectorAll('.admit-card-item button')
             .forEach((btn) => {
               btn.disabled = false;
-              btn.innerText = 'Download';
+              btn.innerText = btn.classList.contains('delete') ? 'Delete' : 'Download';
             });
         }
       }
@@ -183,26 +257,23 @@
         const data = await loadAdmitCard(semester);
         if (!data) return;
 
-        // Create temporary container
         const tempDiv = document.createElement('div');
         tempDiv.style.position = 'fixed';
         tempDiv.style.left = '-9999px';
         tempDiv.innerHTML = document.getElementById('admitCardTemplate').innerHTML;
 
-        // Handle courses based on its type
         let coursesArray = [];
         if (typeof data.courses === 'string') {
           try {
             coursesArray = JSON.parse(data.courses || '[]');
           } catch (error) {
             console.error('Error parsing courses JSON:', error);
-            coursesArray = []; // Default to empty array if parsing fails
+            coursesArray = [];
           }
         } else if (Array.isArray(data.courses)) {
-          coursesArray = data.courses; // Use the array directly if already an array
+          coursesArray = data.courses;
         }
 
-        // Populate content with reduced sizes
         const admitInfo = tempDiv.querySelector('#pdfAdmitInfo');
         admitInfo.innerHTML = `
           <p><strong>Exam:</strong> ${data.semester || 'N/A'} Semester Final Examination of ${data.session || 'N/A'}</p>
@@ -219,36 +290,31 @@
           <p><strong>Transaction ID:</strong> ${data.transaction_id || 'N/A'}</p>
         `;
 
-        // Handle profile image with reduced size
         const profileImg = tempDiv.querySelector('#pdfAdmitCardPhoto');
         if (localStorage.getItem('profileImage')) {
           profileImg.src = localStorage.getItem('profileImage');
         }
-        profileImg.style.width = '30mm'; // Reduced from 50mm
-        profileImg.style.height = '40mm'; // Reduced from 60mm
+        profileImg.style.width = '50mm';
+        profileImg.style.height = '60mm';
 
-        // Reduce logo size
         const logoImg = tempDiv.querySelector('.admit-logo');
-        logoImg.style.width = '40mm'; // Reduced from 80mm
+        logoImg.style.width = '40mm';
 
-        // Apply reduced font sizes and padding
         tempDiv
           .querySelectorAll('h4')
-          .forEach((el) => (el.style.fontSize = '9mm')); // Reduced from 18mm
+          .forEach((el) => (el.style.fontSize = '9mm'));
         tempDiv
           .querySelectorAll('p')
-          .forEach((el) => (el.style.fontSize = '3mm')); // Reduced from 6mm/10mm
-        tempDiv.querySelector('.admit-header').style.marginBottom = '7mm'; // Reduced from 15mm
-        tempDiv.querySelector('.admit-details-pdf').style.margin = '7mm 0'; // Reduced from 15mm
-        tempDiv.querySelector('.admit-footer-pdf').style.marginTop = '7mm'; // Reduced from 15mm
+          .forEach((el) => (el.style.fontSize = '3mm'));
+        tempDiv.querySelector('.admit-header').style.marginBottom = '7mm';
+        tempDiv.querySelector('.admit-details-pdf').style.margin = '7mm 0';
+        tempDiv.querySelector('.admit-footer-pdf').style.marginTop = '7mm';
         tempDiv
           .querySelectorAll('.signature-line')
-          .forEach((el) => (el.style.width = '25mm')); // Reduced from 50mm
+          .forEach((el) => (el.style.width = '25mm'));
 
-        // Add to DOM
         document.body.appendChild(tempDiv);
 
-        // Wait for images to load
         await new Promise((resolve) => {
           if (profileImg.complete && logoImg.complete) return resolve();
           const images = [profileImg, logoImg];
@@ -265,7 +331,6 @@
           });
         });
 
-        // Generate PDF using jsPDF and html2canvas
         try {
           const { jsPDF } = window.jspdf;
           const pdf = new jsPDF({
@@ -274,24 +339,21 @@
             format: 'a4',
           });
 
-          // Render the tempDiv to canvas with reduced scale
           const canvas = await html2canvas(tempDiv, {
-            scale: 1.5, // Reduced from 2 to fit content
+            scale: 1.5,
             logging: true,
             useCORS: true,
             allowTaint: true,
           });
 
-          // Convert canvas to image
           const imgData = canvas.toDataURL('image/png');
-          const imgWidth = 210; // A4 width in mm
-          const pageHeight = 297; // A4 height in mm
+          const imgWidth = 210;
+          const pageHeight = 297;
           const imgHeight = (canvas.height * imgWidth) / canvas.width;
           let heightLeft = imgHeight;
 
           let position = 0;
 
-          // Add the image to PDF, ensuring it fits on one page
           if (imgHeight <= pageHeight) {
             pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
           } else {
@@ -307,7 +369,6 @@
             );
           }
 
-          // Save the PDF
           pdf.save(
             `admit_card_${data.semester || 'latest'}_${
               document.getElementById('studentId').innerText || 'user'
@@ -321,9 +382,41 @@
         }
       }
 
-      async function downloadLatestAdmitCard() {
-        await downloadAdmitCard();
+      async function updateProfile() {
+        const form = document.getElementById('updateProfileForm');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        Object.keys(data).forEach(key => {
+          if (data[key] === '') {
+            delete data[key];
+          }
+        });
+
+        try {
+          const response = await axios.put(
+            'http://localhost:5000/api/users/profile',
+            data,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          alert(response.data.message);
+          loadDashboard();
+          toggleUpdateForm();
+        } catch (error) {
+          console.error('Error updating profile:', error);
+          alert(error.response?.data?.error || 'Failed to update profile');
+        }
       }
+
+      function toggleUpdateForm() {
+        const formSection = document.getElementById('updateProfileSection');
+        formSection.style.display = formSection.style.display === 'none' ? 'block' : 'none';
+      }
+
+      document.getElementById('updateProfileForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        updateProfile();
+      });
 
       const profilePicInput = document.getElementById('profilePic');
       const profileImage = document.getElementById('profileImage');
@@ -355,7 +448,24 @@
         window.history.back();
       }
 
+      async function deleteAdmitCard(registrationId) {
+        if (confirm('Are you sure you want to delete this admit card?')) {
+          try {
+            const response = await axios.delete(
+              `http://localhost:5000/api/exam/admit-card/${registrationId}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            alert(response.data.message);
+            fetchAdmitCards();
+          } catch (error) {
+            console.error('Error deleting admit card:', error.response?.data || error);
+            alert(error.response?.data?.error || 'Failed to delete admit card');
+          }
+        }
+      }
+
       loadDashboard();
+      fetchAdmitCards();
     </script>
   </body>
 </html>

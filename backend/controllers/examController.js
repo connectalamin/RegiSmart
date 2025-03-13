@@ -63,9 +63,9 @@ export const getAdmitCard = async (req, res) => {
       return res.status(401).send({ error: 'User not authenticated' });
     }
 
-    let registration;
+    let registrations;
     if (semester) {
-      registration = await examRegistrationModel
+      registrations = await examRegistrationModel
         .findPaidRegistrationBySemester(userId, semester)
         .catch((err) => {
           console.error('Error fetching registration by semester:', err);
@@ -73,17 +73,18 @@ export const getAdmitCard = async (req, res) => {
             'Failed to fetch registration data for specified semester'
           );
         });
+      registrations = registrations ? [registrations] : [];
     } else {
-      registration = await examRegistrationModel
-        .findPaidRegistration(userId)
+      registrations = await examRegistrationModel
+        .findAllPaidRegistrations(userId)
         .catch((err) => {
-          console.error('Error fetching latest registration:', err);
-          throw new Error('Failed to fetch latest registration data');
+          console.error('Error fetching all registrations:', err);
+          throw new Error('Failed to fetch all registration data');
         });
     }
 
-    if (!registration) {
-      return res.status(403).send({ error: 'No paid registration found' });
+    if (!registrations || registrations.length === 0) {
+      return res.status(403).send({ error: 'No paid registrations found' });
     }
 
     const user = await userModel.findUserById(userId).catch((err) => {
@@ -95,7 +96,8 @@ export const getAdmitCard = async (req, res) => {
       return res.status(404).send({ error: 'User not found' });
     }
 
-    const admitCardData = {
+    const admitCardsData = registrations.map((registration) => ({
+      id: registration.id,
       semester: registration.semester,
       session: user.session || 'N/A',
       name: user.name,
@@ -104,33 +106,33 @@ export const getAdmitCard = async (req, res) => {
       department: user.department || 'N/A',
       hall_name: user.hall_name || 'N/A',
       transaction_id: registration.transaction_id || 'N/A',
-      courses: registration.courses || '[]', // Return as raw JSON string
-    };
+      courses: registration.courses || '[]',
+    }));
 
     if (req.query.format === 'json') {
-      console.log('Returning JSON:', admitCardData);
-      return res.json(admitCardData);
+      console.log('Returning JSON:', admitCardsData);
+      return res.json(admitCardsData);
     }
 
-    // Generate PDF (for non-JSON requests)
     const doc = new PDFDocument();
     res.setHeader('Content-disposition', 'attachment; filename=admit-card.pdf');
     res.setHeader('Content-type', 'application/pdf');
     doc.pipe(res);
+    const data = admitCardsData[0];
     doc.fontSize(20).text('Admit Card', { align: 'center' });
     doc.moveDown();
     doc
       .fontSize(14)
       .text(
-        `Exam: ${admitCardData.semester} Semester Final Examination of ${admitCardData.session}`
+        `Exam: ${data.semester} Semester Final Examination of ${data.session}`
       );
-    doc.text(`Name: ${admitCardData.name}`);
-    doc.text(`Student ID: ${admitCardData.student_id}`);
-    doc.text(`Batch: ${admitCardData.batch}`);
-    doc.text(`Department: ${admitCardData.department}`);
-    doc.text(`Hall: ${admitCardData.hall_name}`);
-    if (admitCardData.courses && admitCardData.courses !== '[]') {
-      const coursesArray = JSON.parse(admitCardData.courses);
+    doc.text(`Name: ${data.name}`);
+    doc.text(`Student ID: ${data.student_id}`);
+    doc.text(`Batch: ${data.batch}`);
+    doc.text(`Department: ${data.department}`);
+    doc.text(`Hall: ${data.hall_name}`);
+    if (data.courses && data.courses !== '[]') {
+      const coursesArray = JSON.parse(data.courses);
       doc.text(
         `Courses: ${coursesArray
           .map((c) => `${c.code} - ${c.name}`)
@@ -139,12 +141,47 @@ export const getAdmitCard = async (req, res) => {
     } else {
       doc.text('Courses: N/A');
     }
-    doc.text(`Transaction ID: ${admitCardData.transaction_id}`);
+    doc.text(`Transaction ID: ${data.transaction_id}`);
     doc.end();
   } catch (error) {
     console.error('Admit card generation error:', error);
     res
       .status(500)
       .send({ error: 'Failed to generate admit card: ' + error.message });
+  }
+};
+
+export const deleteAdmitCard = async (req, res) => {
+  console.log('DELETE request received for admit card ID:', req.params.id); // Add logging
+  try {
+    const registrationId = req.params.id;
+    const userId = req.user.id;
+    console.log('User ID:', userId, 'Registration ID:', registrationId);
+
+    const registration = await examRegistrationModel.findPaidRegistrationById(
+      registrationId
+    );
+    console.log('Found registration:', registration);
+    if (!registration) {
+      return res.status(404).send({ error: 'Admit card not found' });
+    }
+    if (registration.user_id !== userId) {
+      return res
+        .status(403)
+        .send({ error: 'Unauthorized to delete this admit card' });
+    }
+
+    const deleted = await examRegistrationModel.deleteAdmitCard(registrationId);
+    console.log('Delete result:', deleted);
+    if (deleted) {
+      res.send({ message: 'Admit card deleted successfully' });
+    } else {
+      res.status(404).send({ error: 'Admit card not found' });
+    }
+  } catch (error) {
+    console.error('Error in deleteAdmitCard:', error);
+    res
+      .status(500)
+      .send({ error: 'Failed to delete admit card: ' + error.message });
   }
 };

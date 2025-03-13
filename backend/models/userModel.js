@@ -1,4 +1,4 @@
-// @ts-nocheck
+// models/userModel.js
 import pool from '../config/db.js';
 
 const userModel = {
@@ -56,6 +56,33 @@ const userModel = {
         [id]
       );
       return rows[0];
+    } finally {
+      connection.release();
+    }
+  },
+
+  async updateUserProfile(id, updates) {
+    const connection = await pool.getConnection();
+    try {
+      // Filter out undefined or empty values and build the SET clause dynamically
+      const fieldsToUpdate = Object.entries(updates)
+        .filter(([key, value]) => value !== undefined && value !== '')
+        .map(([key, value]) => ({ key, value }));
+
+      if (fieldsToUpdate.length === 0) {
+        return false; // No fields to update
+      }
+
+      // Build the SET clause (e.g., "name = ?, mobile_number = ?")
+      const setClause = fieldsToUpdate
+        .map(({ key }) => `${key} = ?`)
+        .join(', ');
+      const values = fieldsToUpdate.map(({ value }) => value);
+      values.push(id); // Add the ID for the WHERE clause
+
+      const query = `UPDATE users SET ${setClause} WHERE id = ?`;
+      const [result] = await connection.execute(query, values);
+      return result.affectedRows > 0;
     } finally {
       connection.release();
     }

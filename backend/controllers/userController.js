@@ -54,3 +54,22 @@ export const getDashboard = async (req, res) => {
     res.status(500).send({ error: 'Failed to fetch dashboard data' });
   }
 };
+
+export const updateProfile = async (req, res) => {
+  try {
+    const updates = req.body; // Pass the entire request body to the model
+    const userId = req.user.id;
+
+    const updated = await userModel.updateUserProfile(userId, updates);
+
+    if (updated) {
+      const updatedUser = await userModel.findUserById(userId);
+      res.send({ message: 'Profile updated successfully', user: updatedUser });
+    } else {
+      res.status(404).send({ error: 'User not found or no changes made' });
+    }
+  } catch (error) {
+    console.error('Error in updateProfile:', error);
+    res.status(500).send({ error: 'Failed to update profile' });
+  }
+};
